@@ -22,11 +22,11 @@ app.get('/health', (req, res) => {
 
 
 // Konekta sa MySQL (gamit env sa production/Vercel, local default sa dev)
-const dbConfig = {
-    host: process.env.MYSQL_HOST || 'localhost',
-    user: process.env.MYSQL_USER || 'root',
-    password: process.env.MYSQL_PASSWORD || '',
-    database: process.env.MYSQL_DATABASE || 'esulattula_db'
+const dbConfig = process.env.MYSQL_URL || {
+    host: 'localhost',
+    user: 'root',
+    password: '',
+    database: 'esulattula_db'
 };
 const db = mysql.createConnection(dbConfig);
 
