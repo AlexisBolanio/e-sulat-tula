@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="tl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tema - E-SULAT-TULA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/landpage.css">
+    <link rel="stylesheet" href="../css/nav.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/about.css">
+    <style>
+        .btn-auth-link { background: transparent; border: none; color: #5d4037; cursor: pointer; font-weight: 600; margin-right: 12px; }
+        .btn-auth { width: 100%; padding: 12px; background: #5d4037; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; margin-top: 8px; }
+        /* Auth modal */
+        #authModal.modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); align-items: center; justify-content: center; }
+        #authModal.modal .modal-content { background: white; margin: auto; padding: 28px; border-radius: 14px; width: 92%; max-width: 480px; position: relative; text-align: left; box-shadow: 0 8px 30px rgba(0,0,0,0.12); }
+        #authModal .close-button { position: absolute; right: 18px; top: 12px; font-size: 26px; cursor: pointer; color: #888; line-height: 1; }
+        #authModal .close-button:hover { color: #333; }
+        #authModal .auth-box input { width: 100%; padding: 12px 14px; margin: 8px 0; border: 1px solid #e3e3e3; border-radius: 8px; font-size: 0.95rem; box-sizing: border-box; }
+        #authModal .auth-row { display: flex; gap: 12px; }
+        #authModal .auth-row .col { flex: 1; }
+        #authModal .auth-title { margin: 0 0 8px; font-size: 1.25rem; color: #333; }
+        #authModal .toggle-text { margin-top: 12px; font-size: 0.88rem; text-align: center; }
+        #authModal .toggle-text a { color: #5d4037; font-weight: 600; text-decoration: none; }
+        #authModal .form-error { color: #b00020; font-size: 0.95rem; margin-top: 8px; min-height: 18px; }
+        .theme-header { margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #e8e0d5; }
+        .theme-header h1 { margin: 0 0 8px; font-size: 1.8rem; color: #2c1810; }
+        .theme-header .desc { color: #666; font-size: 0.95rem; }
+        .stanzas-list { display: flex; flex-direction: column; gap: 16px; }
+        .stanza-card { background: #f7f0e6; border-radius: 10px; padding: 18px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+        .stanza-card .content { font-style: italic; font-size: 1.05rem; line-height: 1.6; color: #333; white-space: pre-wrap; }
+        .stanza-card .meta { margin-top: 10px; font-size: 0.85rem; color: #888; }
+        .my-stanzas-section { margin-bottom: 24px; }
+        .my-stanzas-section h3 { font-size: 1rem; color: #5d4037; margin: 0 0 12px; display: flex; align-items: center; gap: 8px; }
+        .stanza-card.my-stanza { border-left: 4px solid #d4c4a8; }
+        .stanza-status-badge { display: inline-block; font-size: 0.75rem; font-weight: 600; padding: 4px 10px; border-radius: 20px; margin-left: 8px; }
+        .stanza-status-badge.pending { background: #fff3e0; color: #e65100; }
+        .stanza-status-badge.rejected { background: #ffebee; color: #c62828; }
+        .submit-box { background: #faf6f0; border: 2px dashed #d4c4a8; border-radius: 12px; padding: 24px; margin-top: 24px; }
+        .submit-box h3 { margin: 0 0 12px; font-size: 1.15rem; color: #5d4037; }
+        .submit-box textarea { width: 100%; min-height: 120px; padding: 12px; border: 1px solid #e3e3e3; border-radius: 8px; font-family: inherit; font-size: 1rem; box-sizing: border-box; }
+        .submit-box .hint { font-size: 0.85rem; color: #888; margin-top: 8px; }
+        .submit-box .success-msg { margin-top: 12px; padding: 12px 16px; background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 8px; color: #2e7d32; font-size: 0.95rem; display: none; }
+        .submit-box .success-msg.show { display: block; }
+        .btn-send-stanza {
+            margin-top: 16px;
+            padding: 14px 28px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+            background: linear-gradient(135deg, #5d4037 0%, #4a332c 100%);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 14px rgba(93, 64, 55, 0.35);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-send-stanza:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(93, 64, 55, 0.4); }
+        .btn-send-stanza:active { transform: translateY(0); }
+        .btn-send-stanza:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+        .pagination { display: flex; gap: 8px; align-items: center; margin-top: 20px; flex-wrap: wrap; }
+        .pagination button { padding: 8px 14px; border: 1px solid #d4c4a8; background: white; border-radius: 6px; cursor: pointer; font-weight: 500; }
+        .pagination button:hover { background: #f7f0e6; }
+        .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .pagination .page-info { font-size: 0.9rem; color: #666; margin: 0 8px; }
+        .empty-state { text-align: center; padding: 40px 20px; color: #888; }
+        .empty-state i { font-size: 3rem; margin-bottom: 12px; opacity: 0.5; }
+        #globalLoader { display: none; position: fixed; inset: 0; z-index: 2000; background: rgba(0,0,0,0.35); align-items: center; justify-content: center; }
+        .loader-box { background: white; padding: 18px 22px; border-radius: 10px; display: flex; gap: 12px; align-items: center; box-shadow: 0 8px 36px rgba(0,0,0,0.18); }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .spinner { width: 20px; height: 20px; border-radius: 50%; border: 3px solid #eee; border-top-color: #5d4037; animation: spin 1s linear infinite; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <img src="../assets/picture/new-logo-removebg-preview.png" alt="Logo">
+            </div>
+            <button type="button" class="nav-hamburger" id="navHamburger" aria-label="Buksan ang menu" aria-expanded="false">
+                <span class="nav-hamburger-icon"><i class="fa-solid fa-bars"></i></span>
+            </button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="/pages/landpage.html">Home</a></li>
+                <li><a href="magsulat.html">Magsulat</a></li>
+                <li id="adminNavItem" style="display:none"><a href="admin.html">Admin</a></li>
+            </ul>
+            <div class="user-section">
+                <button type="button" class="nav-dark-toggle" id="navDarkToggle" aria-label="Dark mode" title="Palitan ang tema">
+                    <i class="fa-solid fa-moon" id="navDarkIcon"></i>
+                </button>
+                <span class="welcome-text">Welcome, <span id="nickname">Makata</span></span>
+                <div class="nav-notif-wrap" id="navNotifWrap" style="display:none">
+                    <button id="navNotifBell" class="nav-notif-bell" type="button" title="Mga na-approve na talata" aria-label="Mga notipikasyon">
+                        <i class="fa-solid fa-bell"></i>
+                        <span id="navNotifBadge" class="nav-notif-badge hide">0</span>
+                    </button>
+                    <div id="navNotifDropdown" class="nav-notif-dropdown" aria-hidden="true">
+                        <p class="notif-dropdown-title"><i class="fa-solid fa-check-circle"></i> Mga na-approve na talata</p>
+                        <p class="notif-dropdown-msg" id="navNotifDropdownMsg"></p>
+                        <button type="button" class="notif-dropdown-close" id="navNotifDropdownClose">Sara</button>
+                    </div>
+                </div>
+                <button id="openLoginBtn" class="btn-auth-link" style="display:none">Mag-login</button>
+                <!--<button id="openRegisterBtn" class="btn-auth-link">Mag-register</button>-->
+                <button id="logoutBtn" class="logout-icon" style="display:none">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-wrap">
+    <main style="max-width: 720px; margin: 0 auto; padding: 24px;">
+        <a href="magsulat.html" style="color:#5d4037; text-decoration:none; font-size:0.9rem; margin-bottom:16px; display:inline-block;">
+            <i class="fa-solid fa-arrow-left"></i> Bumalik sa mga Tema
+        </a>
+
+        <div id="themeHeader" class="theme-header">
+            <h1 id="themeTitle">—</h1>
+            <p id="themeDesc" class="desc"></p>
+        </div>
+
+        <div id="myStanzasSection" class="my-stanzas-section" style="display:none">
+            <h3><i class="fa-solid fa-user-pen"></i> Mga talata ko</h3>
+            <div id="myStanzasList" class="stanzas-list"></div>
+        </div>
+
+        <div id="stanzasContainer" class="stanzas-list"></div>
+        <div id="paginationBar" class="pagination" style="display:none"></div>
+
+        <div id="submitSection" class="submit-box" style="display:none">
+            <h3><i class="fa-solid fa-pen-fancy"></i> Magsulat ng Talata</h3>
+            <div id="lastStanzasContext" class="last-stanzas" style="display:none; background:#f0ebe0; padding:14px; border-radius:8px; margin-bottom:16px; font-size:0.9rem;">
+                <strong>Sundan ang sumusunod:</strong>
+                <div id="lastStanzasList" style="margin-top:8px; font-style:italic; color:#444;"></div>
+            </div>
+            <textarea id="stanzaContent" placeholder="Isulat ang iyong talata dito..."></textarea>
+            <p class="hint">Hanggang 3 talata bawat araw. Hindi ka maaaring magsulat ng magkasunod sa parehong tema.</p>
+            <div id="stanzaError" style="color:#b00020; font-size:0.9rem; margin-top:8px; min-height:20px;"></div>
+            <div id="stanzaSuccess" class="success-msg" role="status"></div>
+            <button id="submitStanzaBtn" class="btn-send-stanza" type="button"><i class="fa-solid fa-paper-plane"></i> Ipadala ang Talata</button>
+        </div>
+        <div id="loginPrompt" style="text-align:center; padding:24px; color:#666;">
+            <p>Mag-login para makapagsulat ng talata.</p>
+            <button id="loginPromptBtn" class="btn-auth" style="margin-top:8px">Mag-login</button>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <a href="landpage.html" class="footer-brand">
+                <img src="../assets/picture/new-logo-removebg-preview.png" alt="E-SULAT-TULA">
+                <span>E-SULAT-TULA</span>
+            </a>
+            <p class="footer-credit">
+                Developed with <i class="fa-solid fa-heart" style="color:#c45c4a;"></i> by <a href="#" rel="noopener">E-SULAT-TULA Team</a>
+            </p>
+            <ul class="footer-links">
+                <li><a href="landpage.html">Home</a></li>
+                <li><a href="magsulat.html">Magsulat</a></li>
+            </ul>
+        </div>
+    </footer>
+    </div>
+
+    <div id="globalLoader">
+        <div class="loader-box">
+            <div class="spinner"></div>
+            <span id="globalLoaderText">Naglo-load...</span>
+        </div>
+    </div>
+
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closeModal">&times;</span>
+            
+            <div id="login-box" class="auth-box">
+                <h2 class="auth-title">Login</h2>
+                <form id="loginForm">
+                    <input type="email" id="loginEmail" placeholder="Email" required>
+                    <input type="password" id="loginPassword" placeholder="Password" required>
+                    <div id="loginError" class="form-error" style="color:#b00020; font-size:0.95rem; margin-top:8px; min-height:18px;"></div>
+                    <button type="submit" class="btn-auth">Pumasok</button>
+                </form>
+                <p class="toggle-text">Wala pang account? <a href="javascript:void(0)" onclick="toggleAuth()">Mag-register</a></p>
+            </div>
+
+            <div id="register-box" class="auth-box" style="display: none;">
+                <h2 class="auth-title">Register</h2>
+                <form id="registerForm">
+                    <div class="auth-row">
+                        <div class="col">
+                            <input type="text" id="regFirst" placeholder="First Name" required>
+                        </div>
+                        <div class="col">
+                            <input type="text" id="regLast" placeholder="Last Name" required>
+                        </div>
+                    </div>
+                    <input type="text" id="regName" placeholder="Nickname (display name)" required>
+                    <input type="email" id="regEmail" placeholder="Email" required>
+                    <input type="password" id="regPassword" placeholder="Password" required>
+                    <!-- error message area -->
+                    <div id="registerError" class="form-error" style="color:#b00020; font-size:0.95rem; margin-top:8px; min-height:18px;"></div>
+                    <button type="submit" class="btn-auth">Sumali</button>
+                </form>
+                <p class="toggle-text">May account na? <a href="javascript:void(0)" onclick="toggleAuth()">Mag-login</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="../script/script.js"></script>
+    <script>
+        const API_URL = window.API_BASE || window.API_URL || 'http://localhost:3000';
+        const params = new URLSearchParams(location.search);
+        const themeId = parseInt(params.get('theme_id') || params.get('id'), 10);
+
+        function showLoader(text) {
+            const g = document.getElementById('globalLoader');
+            const t = document.getElementById('globalLoaderText');
+            if (t) t.textContent = text || 'Naglo-load...';
+            if (g) g.style.display = 'flex';
+        }
+        function hideLoader() {
+            const g = document.getElementById('globalLoader');
+            if (g) g.style.display = 'none';
+        }
+
+        function escapeHtml(s) {
+            return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        }
+
+        async function loadThemeInfo() {
+            const res = await fetch(`${API_URL}/themes`);
+            const data = await res.json();
+            const themes = (data && data.themes) || [];
+            const theme = themes.find(t => t.id == themeId);
+            if (theme) {
+                document.getElementById('themeTitle').textContent = theme.title || '—';
+                document.getElementById('themeDesc').textContent = theme.description || '';
+            }
+            return theme;
+        }
+
+        let currentPage = 1;
+        let totalPages = 1;
+
+        function statusLabel(status) {
+            if ((status || '').toLowerCase() === 'pending') return 'Naghihintay ng approval';
+            if ((status || '').toLowerCase() === 'rejected') return 'Nireject';
+            return '';
+        }
+
+        async function loadStanzas(page = 1) {
+            if (!themeId) {
+                document.getElementById('stanzasContainer').innerHTML = '<div class="empty-state"><p>Walang tema na napili.</p></div>';
+                return;
+            }
+            const user = getLoggedInUser();
+            const authorId = user && (user.id !== undefined && user.id !== null) ? Number(user.id) : NaN;
+            const authorParam = (authorId > 0) ? `&author_id=${authorId}` : '';
+            showLoader('Kinumukuha ang mga talata...');
+            try {
+                const res = await fetch(`${API_URL}/stanzas?theme_id=${themeId}&page=${page}${authorParam}`);
+                const data = await res.json();
+                hideLoader();
+                const stanzas = (data && data.stanzas) || [];
+                const myStanzas = Array.isArray(data.my_stanzas) ? data.my_stanzas : [];
+                totalPages = (data && data.total_pages) || 1;
+                currentPage = page;
+
+                const mySection = document.getElementById('myStanzasSection');
+                const myList = document.getElementById('myStanzasList');
+                if (authorId > 0) {
+                    mySection.style.display = 'block';
+                    if (myStanzas.length > 0) {
+                        myList.innerHTML = myStanzas.map(s => {
+                        const status = (s.status || '').toLowerCase();
+                        const badgeClass = status === 'rejected' ? 'rejected' : 'pending';
+                        const label = statusLabel(s.status);
+                        return `
+                        <div class="stanza-card my-stanza">
+                            <div class="content">${escapeHtml(s.content)}</div>
+                            <div class="meta">— ${escapeHtml(s.author_name || 'Makata')} · Pahina ${s.page_number || 1}
+                                <span class="stanza-status-badge ${badgeClass}">${escapeHtml(label)}</span>
+                            </div>
+                        </div>`;
+                    }).join('');
+                    } else {
+                        myList.innerHTML = '<div class="empty-state" style="padding:20px;"><p style="margin:0;">Wala kang pending o rejected na talata sa temang ito.</p></div>';
+                    }
+                } else {
+                    mySection.style.display = 'none';
+                }
+
+                const container = document.getElementById('stanzasContainer');
+                if (stanzas.length === 0 && page === 1) {
+                    container.innerHTML = '<div class="empty-state"><i class="fa-solid fa-feather-pointed"></i><p>Walang talata pa. Ikaw ang unang makata!</p></div>';
+                } else {
+                    container.innerHTML = stanzas.map(s => `
+                        <div class="stanza-card">
+                            <div class="content">${escapeHtml(s.content)}</div>
+                            <div class="meta">— ${escapeHtml(s.author_name || 'Makata')} · Pahina ${s.page_number || 1}</div>
+                        </div>
+                    `).join('');
+                }
+
+                const pagBar = document.getElementById('paginationBar');
+                if (totalPages > 1) {
+                    pagBar.style.display = 'flex';
+                    pagBar.innerHTML = `
+                        <button ${page <= 1 ? 'disabled' : ''} data-page="${page - 1}"><i class="fa-solid fa-chevron-left"></i></button>
+                        <span class="page-info">Pahina ${page} ng ${totalPages}</span>
+                        <button ${page >= totalPages ? 'disabled' : ''} data-page="${page + 1}"><i class="fa-solid fa-chevron-right"></i></button>
+                    `;
+                    pagBar.querySelectorAll('button').forEach(btn => {
+                        if (!btn.disabled) btn.addEventListener('click', () => loadStanzas(parseInt(btn.dataset.page, 10)));
+                    });
+                } else {
+                    pagBar.style.display = 'none';
+                }
+            } catch (err) {
+                console.error(err);
+                hideLoader();
+                document.getElementById('stanzasContainer').innerHTML = '<div class="empty-state"><p>Hindi makuha ang mga talata.</p></div>';
+            }
+        }
+
+        async function loadLastStanzas() {
+            if (!themeId) return;
+            try {
+                const res = await fetch(`${API_URL}/stanzas/last?theme_id=${themeId}&n=5`);
+                const data = await res.json();
+                const stanzas = (data && data.stanzas) || [];
+                const ctx = document.getElementById('lastStanzasContext');
+                const list = document.getElementById('lastStanzasList');
+                if (stanzas.length > 0) {
+                    ctx.style.display = 'block';
+                    list.innerHTML = stanzas.map(s => `<div style="margin-bottom:6px;">${escapeHtml(s.content)}<br><span style="font-size:0.8rem;font-style:normal;color:#888;">— ${escapeHtml(s.author_name || 'Makata')}</span></div>`).join('');
+                } else {
+                    ctx.style.display = 'none';
+                }
+            } catch (e) { document.getElementById('lastStanzasContext').style.display = 'none'; }
+        }
+
+        document.getElementById('submitStanzaBtn').addEventListener('click', async () => {
+            const user = getLoggedInUser();
+            const content = document.getElementById('stanzaContent').value.trim();
+            const errEl = document.getElementById('stanzaError');
+            errEl.textContent = '';
+            if (!user) {
+                errEl.textContent = 'Kailangan mag-login.';
+                return;
+            }
+            if (!content) {
+                errEl.textContent = 'Isulat muna ang iyong talata.';
+                return;
+            }
+            showLoader('Ipinapadala...');
+            try {
+                const res = await fetch(`${API_URL}/stanzas`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ theme_id: themeId, author_id: user.id, content })
+                });
+                const data = await res.json().catch(() => ({}));
+                hideLoader();
+                if (res.ok) {
+                    document.getElementById('stanzaContent').value = '';
+                    errEl.textContent = '';
+                    const successEl = document.getElementById('stanzaSuccess');
+                    if (successEl) {
+                        successEl.textContent = data.message || 'Naipasa ang talata! Hintayin ang approval ng admin.';
+                        successEl.classList.add('show');
+                        successEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                        setTimeout(() => successEl.classList.remove('show'), 6000);
+                    }
+                    loadStanzas(currentPage);
+                    loadLastStanzas();
+                } else {
+                    errEl.textContent = data.message || 'May nangyaring error.';
+                }
+            } catch (err) {
+                console.error(err);
+                hideLoader();
+                errEl.textContent = 'Hindi maabot ang server.';
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            updateAuthUI();
+            const user = getLoggedInUser();
+            if (user && (user.role || '').toLowerCase() === 'admin') {
+                const ni = document.getElementById('adminNavItem');
+                if (ni) ni.style.display = 'block';
+            }
+            const loginPrompt = document.getElementById('loginPrompt');
+            const submitSection = document.getElementById('submitSection');
+            if (user) {
+                if (loginPrompt) loginPrompt.style.display = 'none';
+                if (submitSection) submitSection.style.display = 'block';
+            } else {
+                if (loginPrompt) loginPrompt.style.display = 'block';
+                if (submitSection) submitSection.style.display = 'none';
+            }
+            function openLoginModal() {
+                const m = document.getElementById('authModal');
+                if (m) { m.style.display = 'flex'; const lb = document.getElementById('login-box'); const rb = document.getElementById('register-box'); if (lb) lb.style.display = 'block'; if (rb) rb.style.display = 'none'; }
+            }
+            const openLogin = document.getElementById('openLoginBtn');
+            if (openLogin) openLogin.addEventListener('click', openLoginModal);
+            const loginPromptBtn = document.getElementById('loginPromptBtn');
+            if (loginPromptBtn) loginPromptBtn.addEventListener('click', openLoginModal);
+            await loadThemeInfo();
+            await loadStanzas(1);
+            await loadLastStanzas();
+        });
+    </script>
+</body>
+</html>

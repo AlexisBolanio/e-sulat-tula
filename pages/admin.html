@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="tl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - E-SULAT-TULA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: 'Poppins', sans-serif; background: #f5f0e8; color: #2c1810; min-height: 100vh; }
+        .dashboard { max-width: 1100px; margin: 0 auto; padding: 24px; }
+        .dash-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; flex-wrap: wrap; gap: 16px; }
+        .dash-header h1 { margin: 0; font-size: 1.5rem; color: #2c1810; display: flex; align-items: center; gap: 10px; }
+        .dash-header h1 img { height: 36px; width: auto; }
+        .back-link { color: #5d4037; text-decoration: none; font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 6px; }
+        .back-link:hover { text-decoration: underline; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 28px; }
+        .stat-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+        .stat-card .num { font-size: 2rem; font-weight: 700; color: #5d4037; line-height: 1.2; }
+        .stat-card .label { font-size: 0.85rem; color: #666; margin-top: 4px; }
+        .stat-card.pending .num { color: #c45c4a; }
+        .stat-card.approved .num { color: #4a7a59; }
+        .section-title { font-size: 1.1rem; font-weight: 600; margin: 0 0 16px; color: #2c1810; }
+        .table-wrap { background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        th, td { padding: 14px 16px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f7f0e6; font-weight: 600; font-size: 0.85rem; color: #5d4037; }
+        td { font-size: 0.9rem; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #faf9f7; }
+        .content-cell { max-width: 280px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-style: italic; color: #444; }
+        .actions-cell { white-space: nowrap; }
+        .btn-sm { padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600; margin-right: 6px; }
+        .btn-approve { background: #4a7a59; color: white; }
+        .btn-reject { background: #c45c4a; color: white; }
+        .btn-sm:hover { opacity: 0.9; }
+        .btn-sm:disabled { opacity: 0.5; cursor: not-allowed; }
+        .empty-state { text-align: center; padding: 48px 20px; color: #888; }
+        .empty-state i { font-size: 2.5rem; margin-bottom: 12px; opacity: 0.5; }
+        .empty-state p { margin: 0; }
+        .btn-add { padding: 10px 18px; background: #5d4037; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-add:hover { opacity: 0.9; }
+        .modal-overlay { display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
+        .modal-box { background: white; padding: 24px; border-radius: 12px; width: 90%; max-width: 420px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); }
+        .modal-box h3 { margin: 0 0 16px; font-size: 1.15rem; color: #2c1810; }
+        .modal-box input, .modal-box textarea, .modal-box input[type="number"] { width: 100%; padding: 10px 12px; margin-bottom: 12px; border: 1px solid #ddd; border-radius: 6px; font-family: inherit; box-sizing: border-box; }
+        .modal-box textarea { min-height: 80px; resize: vertical; }
+        .modal-box .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; }
+        .modal-box .btn-cancel { padding: 8px 16px; background: #e0e0e0; color: #333; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; }
+        .modal-box .btn-save { padding: 8px 16px; background: #5d4037; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .modal-box .form-error { color: #c45c4a; font-size: 0.85rem; margin-top: -6px; margin-bottom: 8px; min-height: 18px; }
+        #globalLoader { display: none; position: fixed; inset: 0; z-index: 2000; background: rgba(0,0,0,0.35); align-items: center; justify-content: center; }
+        .loader-box { background: white; padding: 18px 22px; border-radius: 10px; display: flex; gap: 12px; align-items: center; box-shadow: 0 8px 36px rgba(0,0,0,0.18); }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .spinner { width: 20px; height: 20px; border-radius: 50%; border: 3px solid #eee; border-top-color: #5d4037; animation: spin 1s linear infinite; }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <header class="dash-header">
+            <h1>
+                <img src="../assets/picture/lgo-removebg-preview.png" alt="Logo">
+                Admin Dashboard
+            </h1>
+            <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                <span class="welcome-text" style="font-size:0.9rem;color:#666;">Welcome, <span id="adminNickname">Admin</span></span>
+                <button id="addThemeBtn" class="btn-add" type="button" onclick="document.getElementById('addThemeModal').style.display='flex'; document.getElementById('themeTitle').value=''; document.getElementById('themeDesc').value=''; document.getElementById('themePages').value=''; document.getElementById('themeError').textContent='';"><i class="fa-solid fa-plus"></i> Magdagdag ng Tema</button>
+                <!--<a href="/pages/landpage.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Bumalik sa Site</a>-->  
+                <button id="adminLogoutBtn" type="button" class="btn-add" style="background:#c45c4a;"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+            </div>
+        </header>
+
+        <div id="statsRow" class="stats-grid">
+            <div class="stat-card">
+                <div class="num" id="statUsers">—</div>
+                <div class="label">Mga User</div>
+            </div>
+            <div class="stat-card">
+                <div class="num" id="statThemes">—</div>
+                <div class="label">Mga Tema</div>
+            </div>
+            <div class="stat-card pending">
+                <div class="num" id="statPending">—</div>
+                <div class="label">Kailangan i-Approve</div>
+            </div>
+            <div class="stat-card approved">
+                <div class="num" id="statApproved">—</div>
+                <div class="label">Na-approve na</div>
+            </div>
+        </div>
+
+        <h2 class="section-title">Mga Talatang Naghihintay ng Approval</h2>
+        <div class="table-wrap">
+            <div id="pendingContainer"></div>
+        </div>
+    </div>
+
+    <div id="addThemeModal" class="modal-overlay" onclick="if(event.target===this)this.style.display='none'">
+        <div class="modal-box">
+            <h3><i class="fa-solid fa-book-open"></i> Magdagdag ng Tema</h3>
+            <input type="text" id="themeTitle" placeholder="Pamagat ng tema" />
+            <textarea id="themeDesc" placeholder="Maikling deskripsyon (opsyonal)"></textarea>
+            <input type="number" id="themePages" placeholder="Bilang ng mga pahina (opsyonal)" min="1" />
+            <div id="themeError" class="form-error"></div>
+            <div class="modal-actions">
+                <button id="closeThemeModal" class="btn-cancel" type="button" onclick="document.getElementById('addThemeModal').style.display='none'">Kanselahin</button>
+                <button id="saveThemeBtn" class="btn-save">I-save</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="globalLoader">
+        <div class="loader-box">
+            <div class="spinner"></div>
+            <span id="globalLoaderText">Naglo-load...</span>
+        </div>
+    </div>
+
+    <script src="../script/script.js"></script>
+    <script>
+        const API = window.API_BASE || 'http://localhost:3000';
+
+        function showLoader(text) {
+            const g = document.getElementById('globalLoader');
+            const t = document.getElementById('globalLoaderText');
+            if (t) t.textContent = text || 'Naglo-load...';
+            if (g) g.style.display = 'flex';
+        }
+        function hideLoader() {
+            const g = document.getElementById('globalLoader');
+            if (g) g.style.display = 'none';
+        }
+
+        function escapeHtml(s) {
+            return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        }
+
+        async function loadStats(user) {
+            try {
+                const res = await fetch(`${API}/adminstats?admin_id=${user.id}`);
+                const data = await res.json();
+                if (res.ok) {
+                    document.getElementById('statUsers').textContent = data.users ?? '—';
+                    document.getElementById('statThemes').textContent = data.themes ?? '—';
+                    document.getElementById('statPending').textContent = data.pending ?? '—';
+                    document.getElementById('statApproved').textContent = data.approved ?? '—';
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function loadPending() {
+            const user = getLoggedInUser();
+            const container = document.getElementById('pendingContainer');
+            if (!user) {
+                container.innerHTML = '<div class="empty-state"><p>Kailangan mag-login bilang Admin.</p></div>';
+                return;
+            }
+            if ((user.role || '').toLowerCase() !== 'admin') {
+                container.innerHTML = '<div class="empty-state"><p>Admin lang ang may access sa pahinang ito.</p></div>';
+                return;
+            }
+            showLoader('Kinumukuha ang mga pending...');
+            try {
+                const [statsRes, pendingRes] = await Promise.all([
+                    fetch(`${API}/adminstats?admin_id=${user.id}`),
+                    fetch(`${API}/stanzas/pending?admin_id=${user.id}`)
+                ]);
+                const statsData = statsRes.ok ? await statsRes.json() : {};
+                const pendingData = pendingRes.ok ? await pendingRes.json() : {};
+                hideLoader();
+
+                document.getElementById('statUsers').textContent = statsData.users ?? '—';
+                document.getElementById('statThemes').textContent = statsData.themes ?? '—';
+                document.getElementById('statPending').textContent = statsData.pending ?? '—';
+                document.getElementById('statApproved').textContent = statsData.approved ?? '—';
+
+                const pending = (pendingData && pendingData.pending) || [];
+                if (pending.length === 0) {
+                    container.innerHTML = '<table><tbody><tr><td colspan="5"><div class="empty-state"><i class="fa-solid fa-check-circle"></i><p>Walang pending na talata.</p></div></td></tr></tbody></table>';
+                    return;
+                }
+                container.innerHTML = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>May-akda</th>
+                                <th>Tema</th>
+                                <th>Content</th>
+                                <th>Petsa</th>
+                                <th>Gawain</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${pending.map(p => `
+                                <tr data-id="${p.stanza_id}">
+                                    <td>${escapeHtml(p.author_name || 'Makata')}</td>
+                                    <td>${escapeHtml(p.theme_title || '')}</td>
+                                    <td class="content-cell" title="${escapeHtml(p.content || '').replace(/"/g, '&quot;')}">${escapeHtml(p.content || '').substring(0, 80)}${(p.content || '').length > 80 ? '...' : ''}</td>
+                                    <td>${p.created_at ? new Date(p.created_at).toLocaleDateString('tl-PH') : '—'}</td>
+                                    <td class="actions-cell">
+                                        <button class="btn-sm btn-approve" data-id="${p.stanza_id}" data-action="approved">I-approve</button>
+                                        <button class="btn-sm btn-reject" data-id="${p.stanza_id}" data-action="rejected">I-reject</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+                container.querySelectorAll('.btn-sm').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        const id = parseInt(btn.dataset.id, 10);
+                        const action = btn.dataset.action;
+                        if (!id || !action) return;
+                        btn.disabled = true;
+                        const sibling = btn.parentElement.querySelector(`[data-action="${action === 'approved' ? 'rejected' : 'approved'}"]`);
+                        if (sibling) sibling.disabled = true;
+                        showLoader(action === 'approved' ? 'Ina-approve...' : 'Irereject...');
+                        try {
+                            const r = await fetch(`${API}/stanzas/${id}/status`, {
+                                method: 'PATCH',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ admin_id: user.id, status: action })
+                            });
+                            const d = await r.json().catch(() => ({}));
+                            hideLoader();
+                            if (r.ok) {
+                                loadPending();
+                            } else {
+                                btn.disabled = false;
+                                if (sibling) sibling.disabled = false;
+                                alert(d.message || 'May nangyaring error.');
+                            }
+                        } catch (err) {
+                            console.error(err);
+                            hideLoader();
+                            btn.disabled = false;
+                            if (sibling) sibling.disabled = false;
+                            alert('Hindi maabot ang server.');
+                        }
+                    });
+                });
+            } catch (err) {
+                console.error(err);
+                hideLoader();
+                container.innerHTML = '<div class="empty-state"><p>Hindi makuha ang mga data.</p></div>';
+            }
+        }
+
+        document.getElementById('saveThemeBtn').addEventListener('click', async () => {
+            const user = getLoggedInUser();
+            if (!user || (user.role || '').toLowerCase() !== 'admin') return;
+            const title = document.getElementById('themeTitle').value.trim();
+            const desc = document.getElementById('themeDesc').value.trim();
+            const pages = parseInt(document.getElementById('themePages').value, 10) || 0;
+            const errEl = document.getElementById('themeError');
+            errEl.textContent = '';
+            if (!title) {
+                errEl.textContent = 'Kailangan ang pamagat ng tema.';
+                return;
+            }
+            showLoader('Nagsa-save...');
+            try {
+                const res = await fetch(`${API}/themes`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, description: desc, pages })
+                });
+                const data = await res.json().catch(() => ({}));
+                hideLoader();
+                if (res.ok) {
+                    document.getElementById('addThemeModal').style.display = 'none';
+                    loadPending();
+                } else {
+                    errEl.textContent = data.message || 'May nangyaring error.';
+                }
+            } catch (err) {
+                console.error(err);
+                hideLoader();
+                errEl.textContent = 'Hindi maabot ang server.';
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateAuthUI();
+            loadPending();
+        });
+    </script>
+</body>
+</html>

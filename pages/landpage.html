@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="tl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-SULAT-TULA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/landpage.css">
+    <link rel="stylesheet" href="../css/nav.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/about.css">
+    <style>
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); }
+        .modal-content { background: white; margin: 6% auto; padding: 28px; border-radius: 14px; width: 92%; max-width: 480px; position: relative; text-align: left; box-shadow: 0 8px 30px rgba(0,0,0,0.12); }
+        .close-button { position: absolute; right: 18px; top: 12px; font-size: 26px; cursor: pointer; color: #888; }
+        .auth-box input, .auth-box select, .auth-box textarea { width: 100%; padding: 12px 14px; margin: 8px 0; border: 1px solid #e3e3e3; border-radius: 8px; font-size: 0.95rem; box-sizing: border-box; }
+        .auth-row { display: flex; gap: 12px; }
+        .auth-row .col { flex: 1; }
+        .auth-title { margin: 0 0 8px; font-size: 1.25rem; color: #333; }
+        .btn-auth { width: 100%; padding: 12px; background: #5d4037; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; margin-top: 8px; }
+        .toggle-text { margin-top: 12px; font-size: 0.88rem; text-align: center; }
+        .toggle-text a { color: #5d4037; font-weight: 600; text-decoration: none; }
+        .btn-auth-link { background: transparent; border: none; color: #5d4037; cursor: pointer; font-weight: 600; margin-right: 12px; }
+        .form-error { color: #b00020; font-size: 0.95rem; margin-top: 8px; min-height: 18px; }
+        /* Global loading overlay */
+        #globalLoader { display: none; position: fixed; inset: 0; z-index: 2000; background: rgba(0,0,0,0.35); backdrop-filter: blur(2px); align-items: center; justify-content: center; }
+        #globalLoader .loader-box { background: white; padding: 18px 22px; border-radius: 10px; display:flex; gap:12px; align-items:center; box-shadow: 0 8px 36px rgba(0,0,0,0.18); }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .spinner { width:20px; height:20px; border-radius:50%; border:3px solid #eee; border-top-color: #5d4037; animation: spin 1s linear infinite; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <img src="../assets/picture/new-logo-removebg-preview.png" alt="Logo">
+            </div>
+            <button type="button" class="nav-hamburger" id="navHamburger" aria-label="Buksan ang menu" aria-expanded="false">
+                <span class="nav-hamburger-icon"><i class="fa-solid fa-bars"></i></span>
+            </button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="landpage.html" class="active">Home</a></li>
+                <li><a href="magsulat.html">Magsulat</a></li>
+            </ul>
+            <div class="user-section">
+                <button type="button" class="nav-dark-toggle" id="navDarkToggle" aria-label="Dark mode" title="Palitan ang tema">
+                    <i class="fa-solid fa-moon" id="navDarkIcon"></i>
+                </button>
+                <span class="welcome-text">Welcome, <span id="nickname">Makata</span></span>
+                <div class="nav-notif-wrap" id="navNotifWrap" style="display:none">
+                    <button id="navNotifBell" class="nav-notif-bell" type="button" title="Mga na-approve na talata" aria-label="Mga notipikasyon">
+                        <i class="fa-solid fa-bell"></i>
+                        <span id="navNotifBadge" class="nav-notif-badge hide">0</span>
+                    </button>
+                    <div id="navNotifDropdown" class="nav-notif-dropdown" aria-hidden="true">
+                        <p class="notif-dropdown-title"><i class="fa-solid fa-check-circle"></i> Mga na-approve na talata</p>
+                        <p class="notif-dropdown-msg" id="navNotifDropdownMsg"></p>
+                        <button type="button" class="notif-dropdown-close" id="navNotifDropdownClose">Sara</button>
+                    </div>
+                </div>
+                <button id="openLoginBtn" class="btn-auth-link" style="display:none">Mag-login</button>
+                <!--<button id="openRegisterBtn" class="btn-auth-link">Mag-register</button>-->
+                <button id="logoutBtn" class="logout-icon" style="display:none">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-wrap">
+    <main class="hero-section">
+        <div class="hero-container">
+            <div class="hero-logo">
+                <img src="../assets/picture/new-logo-removebg-preview.png" alt="E-SULAT-TULA Big Logo">
+            </div>
+            <div class="hero-text-content">
+                <h1>Iyong Titik, Iyong Tinig.</h1>
+                <p>Ang tahanan ng mga makabagong makata.</p>
+                <div class="hero-actions">
+                    <button id="startWritingBtn" class="btn-primary">Magsimulang Sumulat</button>
+                    <button id="feedbackBtn" class="btn-secondary">Magbigay ng Feedback</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <section id="about" class="about-section">
+
+    <div class="about-container">
+
+        <div class="about-content">
+
+            <span class="subtitle">ANG AMING KWENTO</span>
+
+            <h2>Binubuhay ang Tradisyon sa Digital na Panahon</h2>
+
+            <p>
+
+                Ang <strong>E-SULAT-TULA</strong> ay binuo mula sa pangarap na magkaroon ng isang digital na tahanan ang bawat makatang Pilipino. Sa mundong mabilis ang takbo, layunin naming magbigay ng espasyo para sa paghinto, pag-iisip, at paghabi ng mga salita.
+
+            </p>
+
+            <p>
+
+                Hindi lang ito basta aplikasyon; ito ay isang komunidad kung saan ang bawat taludtod ay may halaga at ang bawat damdamin ay may nakikinig.
+
+            </p>
+
+            <div class="about-stats">
+
+                <div class="stat-item">
+
+                    <h3 id="statUsers">—</h3>
+
+                    <p>Makata</p>
+
+                </div>
+
+                <div class="stat-item">
+
+                    <h3 id="statThemes">—</h3>
+
+                    <p>Tema ng mga Tula</p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="about-image">
+
+            <div class="image-wrapper">
+
+                <img src="https://images.unsplash.com/photo-1517842644237-48839243930d?auto=format&fit=crop&q=80&w=1000" alt="Sining ng Pagsusulat">
+
+                <div class="image-accent"></div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div id="globalLoader">
+        <div class="loader-box">
+            <div class="spinner" aria-hidden="true"></div>
+            <div id="globalLoaderText" style="font-weight:600;color:#333">Naglo-load...</div>
+        </div>
+    </div>
+
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closeSuccess">&times;</span>
+            <h2 class="auth-title">Matagumpay na Rehistro</h2>
+            <p id="successMessage">Salamat sa pagrehistro! Maligayang pagdating.</p>
+            <div style="margin-top:16px; text-align:right;">
+                <button id="successOk" class="btn-auth">Tuloy</button>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <a href="landpage.html" class="footer-brand">
+                <img src="../assets/picture/new-logo-removebg-preview.png" alt="E-SULAT-TULA">
+                <span>E-SULAT-TULA</span>
+            </a>
+            <p class="footer-credit">
+                Developed with <i class="fa-solid fa-heart" style="color:#c45c4a;"></i> by <a href="#" rel="noopener">E-SULAT-TULA Team</a>
+            </p>
+            <ul class="footer-links">
+                <li><a href="landpage.html">Home</a></li>
+                <li><a href="magsulat.html">Magsulat</a></li>
+            </ul>
+        </div>
+    </footer>
+    </div>
+
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closeModal">&times;</span>
+            
+            <div id="login-box" class="auth-box">
+                <h2 class="auth-title">Login</h2>
+                <form id="loginForm">
+                    <input type="email" id="loginEmail" placeholder="Email" required>
+                    <input type="password" id="loginPassword" placeholder="Password" required>
+                    <div id="loginError" class="form-error" style="color:#b00020; font-size:0.95rem; margin-top:8px; min-height:18px;"></div>
+                    <button type="submit" class="btn-auth">Pumasok</button>
+                </form>
+                <p class="toggle-text">Wala pang account? <a href="javascript:void(0)" onclick="toggleAuth()">Mag-register</a></p>
+            </div>
+
+            <div id="register-box" class="auth-box" style="display: none;">
+                <h2 class="auth-title">Register</h2>
+                <form id="registerForm">
+                    <div class="auth-row">
+                        <div class="col">
+                            <input type="text" id="regFirst" placeholder="First Name" required>
+                        </div>
+                        <div class="col">
+                            <input type="text" id="regLast" placeholder="Last Name" required>
+                        </div>
+                    </div>
+                    <input type="text" id="regName" placeholder="Nickname (display name)" required>
+                    <input type="email" id="regEmail" placeholder="Email" required>
+                    <input type="password" id="regPassword" placeholder="Password" required>
+                    <!-- error message area -->
+                    <div id="registerError" class="form-error" style="color:#b00020; font-size:0.95rem; margin-top:8px; min-height:18px;"></div>
+                    <button type="submit" class="btn-auth">Sumali</button>
+                </form>
+                <p class="toggle-text">May account na? <a href="javascript:void(0)" onclick="toggleAuth()">Mag-login</a></p>
+            </div>
+        </div>
+    </div>
+    <script src="../script/script.js"></script>
+    <script>
+        (function() {
+            var API = window.API_BASE || (typeof location !== 'undefined' && location.origin && location.origin !== 'null' ? location.origin : 'http://localhost:3000');
+            var base = String(API).replace(/\/$/, '');
+            function num(val) { var n = Number(val); return isNaN(n) ? 0 : n; }
+            function loadAboutStats() {
+                var usersEl = document.getElementById('statUsers');
+                var tulaEl = document.getElementById('statThemes');
+                if (!usersEl && !tulaEl) return;
+                fetch(base + '/countUsers').then(function(r) { return r.ok ? r.json() : {}; }).then(function(d) {
+                    if (usersEl) usersEl.textContent = num(d.count);
+                }).catch(function() { if (usersEl) usersEl.textContent = '0'; });
+                fetch(base + '/countStanzas').then(function(r) { return r.ok ? r.json() : {}; }).then(function(d) {
+                    if (tulaEl) tulaEl.textContent = num(d.count);
+                }).catch(function() { if (tulaEl) tulaEl.textContent = '0'; });
+            }
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', loadAboutStats);
+            } else {
+                loadAboutStats();
+            }
+        })();
+    </script>
+</body>
+</html>
